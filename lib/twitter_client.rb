@@ -18,6 +18,10 @@ class TwitterClient
     @client.update content
   end
 
+  def reply_to_with(tweet_id, content)
+    @client.update content, in_reply_to_status_id: tweet_id
+  end
+
   private
 
   def initialize_client
