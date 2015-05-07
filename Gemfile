@@ -35,7 +35,7 @@ gem 'thin'
 
 gem 'twitter'
 gem 'open-weather'
-gem 'tweetstream'
+# gem 'tweetstream'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and

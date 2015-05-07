@@ -10,18 +10,20 @@ class TwitterStreamClient
     @twitter_access_token    = Rails.application.secrets.twitter_access_token || ENV["TWITTER_ACCESS_TOKEN"]
     @twitter_access_secret   = Rails.application.secrets.twitter_access_secret || ENV["TWITTER_ACCESS_SECRET"]
 
-    @stream_client_config ||= initialize_stream_client
-    @stream_client ||= TweetStream::Client.new
-
+    @stream_client ||= initialize_stream_client
   end
 
   def listen_to_mentions
-    @stream_client.userstream do |status|
-      if status.text.include? @twitter_handler
-        user_to_mention = status.user.screen_name
-        place = status.text.gsub(@twitter_handler, "").strip
-        forecast_answer = WeatherBotParser.forecast place
-        TwitterClient.instance.reply_to_with status.id, "@#{user_to_mention} #{forecast_answer}"
+    return if @stream_client.credentials?
+    @stream_client.user do |status|
+      case status
+      when Twitter::Tweet
+        if status.text.include? @twitter_handler
+          user_to_mention = status.user.screen_name
+          place = status.text.gsub(@twitter_handler, "").strip
+          forecast_answer = WeatherBotParser.forecast place
+          TwitterClient.instance.reply_to_with status.id, "@#{user_to_mention} #{forecast_answer}"
+        end
       end
     end
   end
@@ -29,11 +31,12 @@ class TwitterStreamClient
   private
 
   def initialize_stream_client
-    TweetStream.configure do |config|
+    # TweetStream.configure do |config|
+    Twitter::Streaming::Client.new do |config|
       config.consumer_key        = @twitter_consumer_key
       config.consumer_secret     = @twitter_consumer_secret
-      config.oauth_token         = @twitter_access_token
-      config.oauth_token_secret  = @twitter_access_secret
+      config.access_token         = @twitter_access_token
+      config.access_token_secret  = @twitter_access_secret
     end
   end
 end
