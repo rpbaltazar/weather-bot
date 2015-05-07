@@ -31,7 +31,6 @@ class TwitterStreamClient
   private
 
   def initialize_stream_client
-    # TweetStream.configure do |config|
     Twitter::Streaming::Client.new do |config|
       config.consumer_key        = @twitter_consumer_key
       config.consumer_secret     = @twitter_consumer_secret
