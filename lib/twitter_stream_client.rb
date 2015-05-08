@@ -14,7 +14,6 @@ class TwitterStreamClient
   end
 
   def listen_to_mentions
-    return if @stream_client.credentials?
     @stream_client.user do |status|
       case status
       when Twitter::Tweet
